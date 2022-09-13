@@ -45,10 +45,10 @@ app.post("/users", async (req, res) => {
             photo: req.body.photo,
             email: req.body.email,
             hobbies: {
-                 // @ts-ignore
+                // @ts-ignore
                 connectOrCreate: req.body.hobbies.map(hobby => ({
                     where: { name: hobby },
-                    create: { name: hobby}
+                    create: { name: hobby }
                 })
                 )
             }
@@ -58,16 +58,32 @@ app.post("/users", async (req, res) => {
     res.send(newUser)
 })
 
-// app.patch("/users/:id", async (req, res) => {
-//     const id = Number(req.params.id)
-//     const user = await prisma.user.update({ where: { id: id }, data: req.body , include:{Hobby:true}})
-//     if (user) {
-//         res.send(user)
-//     }
-//     else {
-//         res.status(404).send({ error: "No user found." })
-//     }
-// })
+app.patch("/users/:id", async (req, res) => {
+    const id = Number(req.params.id)
+    const user = await prisma.user.update({
+        where: { id: id },
+        data: {
+            name: req.body.name,
+            photo: req.body.photo,
+            email: req.body.email,
+            hobbies: {
+                // @ts-ignore
+                connectOrCreate: req.body.hobbies.map(hobby => ({
+                    where: { name: hobby },
+                    create: { name: hobby }
+                })
+                )
+            }
+        },
+        include: { hobbies: true }
+    })
+    if (user) {
+        res.send(user)
+    }
+    else {
+        res.status(404).send({ error: "No user found." })
+    }
+})
 
 // app.delete("/users/:id", async (req, res) => {
 //     const id = Number(req.params.id)
